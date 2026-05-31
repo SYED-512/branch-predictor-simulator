@@ -1,16 +1,18 @@
-﻿import random
-import os
+# trace_generator.py
+import random
 
 def generate_loop_trace(iterations=200, loop_len=10):
+    """Simulates a loop: branch taken most of the time, not-taken at loop exit."""
     trace = []
     addr = 0x1000
     for _ in range(iterations):
         for i in range(loop_len):
-            taken = (i < loop_len - 1)
+            taken = (i < loop_len - 1)  # taken every iteration except last
             trace.append((addr, taken))
     return trace
 
 def generate_random_trace(n=500, taken_prob=0.6):
+    """Truly random branch outcomes."""
     trace = []
     for i in range(n):
         addr = random.choice([0x1000, 0x1010, 0x1020, 0x1030])
@@ -18,6 +20,7 @@ def generate_random_trace(n=500, taken_prob=0.6):
     return trace
 
 def generate_nested_if_trace(n=300):
+    """Alternating taken/not-taken — worst case for 1-bit predictor."""
     trace = []
     for i in range(n):
         addr = 0x2000 + (i % 4) * 0x10
@@ -40,9 +43,10 @@ def load_trace(filename):
                 trace.append((addr, taken))
     return trace
 
-if __name__ == '__main__':
-    os.makedirs('traces', exist_ok=True)
-    save_trace(generate_loop_trace(), 'traces/loop_heavy.txt')
-    save_trace(generate_random_trace(), 'traces/random.txt')
-    save_trace(generate_nested_if_trace(), 'traces/nested_if.txt')
-    print('Traces generated in traces/ folder.')
+if __name__ == "__main__":
+    import os
+    os.makedirs("traces", exist_ok=True)
+    save_trace(generate_loop_trace(), "traces/loop_heavy.txt")
+    save_trace(generate_random_trace(), "traces/random.txt")
+    save_trace(generate_nested_if_trace(), "traces/nested_if.txt")
+    print("Traces generated in traces/ folder.")
